@@ -10,22 +10,6 @@ import (
 	"text/template"
 )
 
-// Render takes an input template configuration of type Layout and creates a directory
-// structure with rendered Go templates from the configuration variables specified.
-func (c Config) Render(layout map[string]interface{}) error {
-	parsed, err := parseLayout(layout, nil)
-	if err != nil {
-		return fmt.Errorf("error parsing data: %v", err)
-	}
-
-	err = c.walkLayout(parsed, "")
-	if err != nil {
-		return fmt.Errorf("error creating dirs: %v", err)
-	}
-
-	return nil
-}
-
 // parseLayout creates a linked list of variables
 func parseLayout(yamlConfig map[string]interface{}, v *Vars) (*Vars, error) {
 	if v == nil {
@@ -176,16 +160,4 @@ func createLink(src, dst string) error {
 		return fmt.Errorf("could not create link %s: %v", src, err)
 	}
 	return nil
-}
-
-// HCLJoin converts a list of interfaces to a list of strings in HCL/Terraform friendly format
-// For example, []string{"this", "that", "the other"} wouid produce: ["this", "that", "the other"]
-func HCLJoin(values []interface{}) string {
-	var s []string
-	for _, v := range values {
-		v := fmt.Sprintf("\"%s\"", v.(string))
-		s = append(s, v)
-	}
-
-	return fmt.Sprintf("[%s]", strings.Join(s, ", "))
 }

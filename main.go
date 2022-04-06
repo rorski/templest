@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"os"
 
@@ -61,18 +60,4 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error walking parsed YAML: %v\n", err)
 	}
-}
-
-// ParseYAMLConfig unmarshals the input YAML configuration file into a go structure
-func (c Config) ParseYAMLConfig(filename string) (parsedLayout map[string]interface{}, err error) {
-	data, err := os.ReadFile(filename)
-	if err != nil {
-		return nil, fmt.Errorf("error reading yaml config file %s: %v", filename, err)
-	}
-
-	err = yaml.Unmarshal(data, &parsedLayout)
-	if err != nil {
-		return nil, fmt.Errorf("error unmarshaling YAML config: %v", err)
-	}
-	return parsedLayout, nil
 }
