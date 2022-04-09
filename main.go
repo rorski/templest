@@ -23,6 +23,7 @@ type Vars struct {
 	SubDirs  []*Vars
 }
 
+// the YAML key used to define the overall directory structure in the input configuration
 const layoutKey string = "layout"
 
 func main() {
@@ -33,6 +34,7 @@ func main() {
 
 	if *config == "" || *outPath == "" || *templatePath == "" {
 		flag.Usage()
+		os.Exit(1)
 	}
 
 	c := &Config{

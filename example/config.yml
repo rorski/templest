@@ -1,0 +1,33 @@
+# This is an example YAML config file for templizer
+layout:
+  tmpl_vars: # these variables are written to the top level of the directory, in "vars.tf"
+    env: prod
+    region: us-west-2
+  vpc: # variables under here are written to templates in the vpc/ subdirectory
+    tmpl_vars:
+      source_path: "terraform-aws-modules/vpc/aws"
+      name: my-vpc
+      cidr: 10.0.0.0/16
+      azs:
+        - us-west-2a
+        - us-west-2b
+        - us-west-2c
+      private_subnets:
+        - 10.0.1.0/24
+        - 10.0.2.0/24
+        - 10.0.3.0/24
+      public_subnets:
+        - 10.0.101.0/24
+        - 10.0.102.0/24
+        - 10.0.103.0/24
+    vpc_endpoints: # variables here are written to templates in the vpc_endpoints/ subdirectory of vpc/
+      tmpl_vars:
+        create_dns: true
+  lambda:
+    tmpl_vars:
+      source_path: "terraform-aws-modules/lambda/aws"
+      runtime: "python3.8"
+    src:
+      tmpl_vars:
+        bucket: "my-bucket-1234abcd"
+        s3file: "myfile.txt"

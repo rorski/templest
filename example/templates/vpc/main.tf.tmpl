@@ -1,0 +1,21 @@
+{{ with .TmplVars -}}
+module "my-vpc" {
+  source = "{{ .source_path }}"
+
+  name = "{{ .name }}"
+  cidr = "{{ .cidr }}"
+
+  azs             = {{ .azs | HCLJoin }}
+  private_subnets = {{ .private_subnets | HCLJoin }}
+  public_subnets  = {{ .public_subnets | HCLJoin }}
+
+  tags = {
+    Environment = local.env
+  }
+}
+{{ end -}}
+
+module "vpc-endpoints" {
+  source = "./vpc-endpoints"
+  env    = local.env
+}

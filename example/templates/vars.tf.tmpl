@@ -1,0 +1,6 @@
+{{ with .TmplVars -}}
+locals {
+    env    = "{{ .env }}"
+    region = "{{ .region }}"
+}
+{{- end }}
