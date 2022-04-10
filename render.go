@@ -4,54 +4,65 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
 )
 
+// Directory holds the name and template variables for the files in that directory
+// The SubDirs field is a linked list to subdirectories of the dir in the Name field
+type Directory struct {
+	Name    string
+	Vars    map[string]interface{}
+	SubDirs []*Directory
+}
+
 // parseLayout creates a linked list of variables
-func parseLayout(yamlConfig map[string]interface{}, v *Vars) (*Vars, error) {
-	if v == nil {
-		v = new(Vars)
+func parseLayout(yamlConfig map[string]interface{}, dir *Directory) (*Directory, error) {
+	if dir == nil {
+		dir = new(Directory)
 	}
 	for k := range yamlConfig {
 		switch k {
-		case "tmpl_vars":
-			v.TmplVars = yamlConfig[k].(map[string]interface{})
+		case "_vars":
+			dir.Vars = yamlConfig[k].(map[string]interface{})
+		case "_meta":
+			log.Println("not implemented")
 		default:
 			// recursively parse subdirectories
 			if yamlConfig[k] != nil {
-				sub, err := parseLayout(yamlConfig[k].(map[string]interface{}), &Vars{Name: k})
+				sub, err := parseLayout(yamlConfig[k].(map[string]interface{}), &Directory{Name: k})
 				if err != nil {
 					return nil, fmt.Errorf("error parsing layout: %v", err)
 				}
-				v.SubDirs = append(v.SubDirs, sub)
+				dir.SubDirs = append(dir.SubDirs, sub)
 			} else {
 				// if there are no template variables defined, just create the subdir name,
 				// so any files in that template directory will still be copied to the output
-				v.SubDirs = append(v.SubDirs, &Vars{Name: k})
+				dir.SubDirs = append(dir.SubDirs, &Directory{Name: k})
 			}
 		}
 	}
 
-	return v, nil
+	return dir, nil
 }
 
 // walkLayout walks the parsed YAML config, rendering and copying files at each directory level
-func (c Config) walkLayout(v *Vars, path string) error {
-	err := os.MkdirAll(filepath.Join(c.OutPath, path, v.Name), 0755)
+func (c Config) walkLayout(dir *Directory, path string) error {
+	err := os.MkdirAll(filepath.Join(c.OutPath, path, dir.Name), 0755)
 	if err != nil {
 		return fmt.Errorf("error creating directory: %v", err)
 	}
-	err = c.handleFiles(v, path)
+	err = c.handleFiles(dir, path)
 	if err != nil {
 		return fmt.Errorf("error handling file at %s: %v", path, err)
 	}
-	if len(v.SubDirs) != 0 {
+	if len(dir.SubDirs) != 0 {
 		// recursively walk the parsed yaml for each subdirectory defined
-		for _, s := range v.SubDirs {
-			err := c.walkLayout(s, filepath.Join(path, v.Name))
+		for _, s := range dir.SubDirs {
+			err := c.walkLayout(s, filepath.Join(path, dir.Name))
 			if err != nil {
 				return err
 			}
@@ -61,9 +72,9 @@ func (c Config) walkLayout(v *Vars, path string) error {
 	return nil
 }
 
-func (c Config) handleFiles(v *Vars, path string) error {
-	tmplDir := filepath.Join(c.TemplatePath, path, v.Name)
-	outDir := filepath.Join(c.OutPath, path, v.Name)
+func (c Config) handleFiles(dir *Directory, path string) error {
+	tmplDir := filepath.Join(c.TemplatePath, path, dir.Name)
+	outDir := filepath.Join(c.OutPath, path, dir.Name)
 
 	files, err := os.ReadDir(tmplDir)
 	if err != nil {
@@ -92,7 +103,7 @@ func (c Config) handleFiles(v *Vars, path string) error {
 			}
 		default:
 			if strings.HasSuffix(f.Name(), ".tmpl") {
-				err = v.renderTemplate(f, tmplDir, outDir)
+				err = dir.renderTemplate(f, tmplDir, outDir)
 				if err != nil {
 					return fmt.Errorf("error rendering template %s: %v", f.Name(), err)
 				}
@@ -108,7 +119,7 @@ func (c Config) handleFiles(v *Vars, path string) error {
 	return nil
 }
 
-func (v *Vars) renderTemplate(file fs.DirEntry, tmplDir string, outDir string) error {
+func (dir *Directory) renderTemplate(file fs.DirEntry, tmplDir string, outDir string) error {
 	t, err := template.New("").Funcs(template.FuncMap{
 		"HCLJoin": HCLJoin,
 	}).ParseFiles(filepath.Join(tmplDir, file.Name()))
@@ -122,7 +133,7 @@ func (v *Vars) renderTemplate(file fs.DirEntry, tmplDir string, outDir string) e
 	}
 	// execute the template with the base name as parsed above
 	// see https://stackoverflow.com/questions/44979276/the-go-template-parsefiles-func-parsing-multiple-files
-	err = t.ExecuteTemplate(outFile, file.Name(), v)
+	err = t.ExecuteTemplate(outFile, file.Name(), dir)
 	if err != nil {
 		return fmt.Errorf("could not execute template for %s: %v", outFile.Name(), err)
 	}

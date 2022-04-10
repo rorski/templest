@@ -1,10 +1,10 @@
 module "lambda_function" {
-  source = "{{ .TmplVars.source_path }}"
+  source = "{{ .Vars.source_path }}"
 
   function_name = "my-lambda1"
   description   = "Some lambda function"
   handler       = "index.handler"
-  runtime       = "{{ .TmplVars.runtime }}"
+  runtime       = "{{ .Vars.runtime }}"
 
   source_path = "./src/lambda-function1"
 

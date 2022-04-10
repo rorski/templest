@@ -15,14 +15,6 @@ type Config struct {
 	YamlConfigFile string
 }
 
-// Vars holds the directory name and template variables for the files in that directory
-// The SubDirs field is a linked list to subdirectories of the dir in the Name field
-type Vars struct {
-	Name     string
-	TmplVars map[string]interface{}
-	SubDirs  []*Vars
-}
-
 // the YAML key used to define the overall directory structure in the input configuration
 const layoutKey string = "layout"
 

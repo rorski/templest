@@ -1,5 +1,5 @@
 module "lambda_function" {
-  source = "terraform-aws-modules/lambda/aws"
+  source = "<no value>"
 
   function_name = "my-lambda1"
   description   = "Some lambda function"

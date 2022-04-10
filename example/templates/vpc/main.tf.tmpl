@@ -1,13 +1,13 @@
-{{ with .TmplVars -}}
+{{ with .Vars -}}
 module "my-vpc" {
-  source = "{{ .source_path }}"
+  source = "{{ .sourcePath }}"
 
   name = "{{ .name }}"
   cidr = "{{ .cidr }}"
 
   azs             = {{ .azs | HCLJoin }}
-  private_subnets = {{ .private_subnets | HCLJoin }}
-  public_subnets  = {{ .public_subnets | HCLJoin }}
+  private_subnets = {{ .privateSubnets | HCLJoin }}
+  public_subnets  = {{ .publicSubnets | HCLJoin }}
 
   tags = {
     Environment = local.env
