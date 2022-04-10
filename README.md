@@ -30,6 +30,5 @@ Cookiecutter is a feasible tool for this but had some limitations (at least as o
 * Cookiecutter [only supports JSON configuration](https://github.com/cookiecutter/cookiecutter/issues/970#issuecomment-336695070), which in my opinion is not a good configuration language. Templizer uses YAML.
 * I prefered a tool that runs as a single binary (hence Go)
 * Cookiecutter doesn't support copying symlinks natively - you need to use a hook for that.
-* I prefer Go templates to Jinja2 mostly due to familiarity, but also because the latter [doesn't allow for dashes in variable names](https://stackoverflow.com/questions/27779024/setting-data-attributes-on-a-wtforms-field) which is frustrating if your template variable happens to have a dash in it.
 
 Cookiecutter also provides a number of features that this project doesn't, such as pointing at a cookiecutter formatted git repository and pre/post-hooks. Some of those features may be implemeted in future versions of templizer.
