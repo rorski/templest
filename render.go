@@ -15,25 +15,25 @@ import (
 // The SubDirs field is a linked list to subdirectories of the dir in the Name field
 type Directory struct {
 	Name    string
-	Vars    map[string]interface{}
+	Vars    map[string]any
 	SubDirs []*Directory
 }
 
 // parseLayout creates a linked list of variables
-func parseLayout(yamlConfig map[string]interface{}, dir *Directory) (*Directory, error) {
+func parseLayout(yamlConfig map[string]any, dir *Directory) (*Directory, error) {
 	if dir == nil {
 		dir = new(Directory)
 	}
 	for k := range yamlConfig {
 		switch k {
 		case "_vars":
-			dir.Vars = yamlConfig[k].(map[string]interface{})
+			dir.Vars = yamlConfig[k].(map[string]any)
 		case "_meta":
 			log.Println("not implemented")
 		default:
 			// recursively parse subdirectories
 			if yamlConfig[k] != nil {
-				sub, err := parseLayout(yamlConfig[k].(map[string]interface{}), &Directory{Name: k})
+				sub, err := parseLayout(yamlConfig[k].(map[string]any), &Directory{Name: k})
 				if err != nil {
 					return nil, fmt.Errorf("error parsing layout: %v", err)
 				}

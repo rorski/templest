@@ -39,13 +39,13 @@ func main() {
 	if err != nil {
 		log.Fatalf("Error reading yaml config file %s: %v", *config, err)
 	}
-	var data map[string]interface{}
+	var data map[string]any
 	err = yaml.Unmarshal(f, &data)
 	if err != nil {
 		log.Fatalf("Error unmarshaling YAML config: %v", err)
 	}
 
-	parsedLayout, err := parseLayout(data[layoutKey].(map[string]interface{}), nil)
+	parsedLayout, err := parseLayout(data[layoutKey].(map[string]any), nil)
 	if err != nil {
 		log.Fatalf("Error parsing data: %v\n", err)
 	}
