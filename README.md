@@ -22,7 +22,8 @@ Usage of templest:
 For example, `./templest -config example/config.yml -templates example/templates -out example/out`
 
 See [the example directory](https://github.com/rorski/templest/example) for a sample of a YAML configuration and the output it produces.
-
+### Building
+`make build` or just `go build`
 ### Why though?
 This was initially created to help quickly create [terraform module structures](https://www.terraform.io/language/modules/develop/structure) for various clusters based on a simple input file that could generate that project structure.
 
