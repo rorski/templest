@@ -1,4 +1,4 @@
-module github.com/rorski/templizer
+module github.com/rorski/templest
 
 go 1.18
 

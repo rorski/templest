@@ -1,4 +1,4 @@
-# This is an example YAML config file for templizer
+# This is an example YAML config file for templest
 layout:
   _vars: # these variables are written to the top level of the directory, in "vars.tf"
     env: prod

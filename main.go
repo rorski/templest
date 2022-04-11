@@ -8,7 +8,7 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-// Config is the input configuration struct for templizer
+// Config is the input configuration struct for templest
 type Config struct {
 	OutPath        string
 	TemplatePath   string
