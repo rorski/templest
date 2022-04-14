@@ -1,4 +1,4 @@
-package main
+package templest
 
 import (
 	"fmt"
@@ -9,7 +9,19 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"sigs.k8s.io/yaml"
 )
+
+// the YAML key used to define the overall directory structure in the input configuration
+const layoutKey string = "layout"
+
+// Config is the input configuration struct for templest
+type Config struct {
+	OutPath        string
+	TemplatePath   string
+	YAMLConfigFile string
+}
 
 // Directory holds the name and template variables for the files in that directory
 // The SubDirs field is a linked list to subdirectories of the dir in the Name field
@@ -17,6 +29,31 @@ type Directory struct {
 	Name    string
 	Vars    map[string]any
 	SubDirs []*Directory
+}
+
+func Run(c *Config) error {
+	// open the config file and unmarshal the YAML to a go data structure
+	f, err := os.ReadFile(c.YAMLConfigFile)
+	if err != nil {
+		return fmt.Errorf("error reading yaml config file %s: %v", c.YAMLConfigFile, err)
+	}
+	var data map[string]any
+	err = yaml.Unmarshal(f, &data)
+	if err != nil {
+		return fmt.Errorf("error unmarshaling YAML config: %v", err)
+	}
+
+	parsedLayout, err := parseLayout(data[layoutKey].(map[string]any), nil)
+	if err != nil {
+		return fmt.Errorf("error parsing data: %v\n", err)
+	}
+
+	err = c.walkLayout(parsedLayout, "")
+	if err != nil {
+		return fmt.Errorf("error walking parsed YAML: %v\n", err)
+	}
+
+	return nil
 }
 
 // parseLayout creates a linked list of variables
@@ -50,7 +87,7 @@ func parseLayout(yamlConfig map[string]any, dir *Directory) (*Directory, error) 
 }
 
 // walkLayout walks the parsed YAML config, rendering and copying files at each directory level
-func (c Config) walkLayout(dir *Directory, path string) error {
+func (c *Config) walkLayout(dir *Directory, path string) error {
 	err := os.MkdirAll(filepath.Join(c.OutPath, path, dir.Name), 0755)
 	if err != nil {
 		return fmt.Errorf("error creating directory: %v", err)
@@ -72,7 +109,7 @@ func (c Config) walkLayout(dir *Directory, path string) error {
 	return nil
 }
 
-func (c Config) handleFiles(dir *Directory, path string) error {
+func (c *Config) handleFiles(dir *Directory, path string) error {
 	tmplDir := filepath.Join(c.TemplatePath, path, dir.Name)
 	outDir := filepath.Join(c.OutPath, path, dir.Name)
 
