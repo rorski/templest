@@ -6,7 +6,7 @@ clean:
 	rm -f ./templest-*
 
 build:
-	GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./templest-${GOOS}-${GOARCH}-${VERSION} ./main.go ./render.go ./tmplfuncs.go
+	GOOS=${GOOS} GOARCH=${GOARCH} go build -o ./templest-${GOOS}-${GOARCH}-${VERSION} ./main.go
 
 test:
 	go test
