@@ -21,7 +21,7 @@ Usage of templest:
 ```
 For example, `./templest -config example/config.yml -templates example/templates -out example/out`
 
-See [the example directory](https://github.com/rorski/templest/example) for a sample of a YAML configuration and the output it produces.
+See [the example directory](https://github.com/rorski/templest/tree/main/example) for a sample of a YAML configuration and the output it produces.
 ### Building
 `make build` or just `go build`
 ### Why though?
